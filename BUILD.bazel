@@ -1,0 +1,63 @@
+load("@npm//:defs.bzl", "npm_link_all_packages")
+load("@aspect_rules_js//js:defs.bzl", "js_library")
+load("@rules_uv//uv:pip.bzl", "pip_compile")
+
+
+package(default_visibility = ["//visibility:public"])
+
+# gazelle:map_kind py_library py_library @aspect_rules_py//py:defs.bzl
+# gazelle:map_kind py_binary py_binary @aspect_rules_py//py:defs.bzl
+# gazelle:map_kind py_test py_test @aspect_rules_py//py:defs.bzl
+
+# Link npm packages at workspace root
+npm_link_all_packages(name = "node_modules")
+
+# Export requirements files for Python projects
+exports_files([
+    "requirements.txt",
+    "requirements_gpu.txt",
+    "requirements_lock.txt",
+    "requirements_gpu_lock.txt",
+    # Platform-specific requirements
+    "requirements_linux_x86_64.txt",
+    "requirements_linux_x86_64_cuda.txt", 
+    "requirements_darwin_arm64.txt",
+    "requirements_linux_x86_64_lock.txt",
+    "requirements_linux_x86_64_cuda_lock.txt",
+    "requirements_darwin_arm64_lock.txt",
+])
+
+# CPU PyTorch dependencies (default)
+pip_compile(
+    name = "requirements_cpu",
+    requirements_in = "requirements.txt",
+    requirements_txt = "requirements_lock.txt",
+)
+
+# GPU PyTorch dependencies
+pip_compile(
+    name = "requirements_gpu",
+    requirements_in = "requirements_gpu.txt",
+    requirements_txt = "requirements_gpu_lock.txt",
+)
+
+# Platform-specific pip_compile targets
+pip_compile(
+    name = "requirements_linux_x86_64",
+    requirements_in = "requirements_linux_x86_64.txt",
+    requirements_txt = "requirements_linux_x86_64_lock.txt",
+)
+
+pip_compile(
+    name = "requirements_linux_x86_64_cuda",
+    requirements_in = "requirements_linux_x86_64_cuda.txt", 
+    requirements_txt = "requirements_linux_x86_64_cuda_lock.txt",
+)
+
+pip_compile(
+    name = "requirements_darwin_arm64",
+    requirements_in = "requirements_darwin_arm64.txt",
+    requirements_txt = "requirements_darwin_arm64_lock.txt",
+)
+
+

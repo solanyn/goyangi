@@ -1,0 +1,41 @@
+load("@aspect_rules_py//py:defs.bzl", "py_binary", "py_library")
+
+# Python library for PyTorch utilities
+py_library(
+    name = "torch_utils",
+    srcs = ["torch_utils.py"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//torches:torch_deps",
+    ],
+)
+
+# Main PyTorch application
+py_binary(
+    name = "main",
+    srcs = ["main.py"],
+    main = "main.py",
+    visibility = ["//visibility:public"],
+    deps = [
+        ":torch_utils",
+        "//torches:torch_deps",
+    ],
+)
+
+# Dependencies target for PyTorch (platform-specific)
+py_library(
+    name = "torch_deps",
+    visibility = ["//visibility:public"],
+    deps = select({
+        "//constraints:cuda": [
+            "@pip_by_platform//numpy",
+            "@pip_by_platform//torch", 
+            "@pip_by_platform//torchvision",
+        ],
+        "//conditions:default": [
+            "@pip_by_platform//numpy",
+            "@pip_by_platform//torch",
+            "@pip_by_platform//torchvision",
+        ],
+    }),
+)

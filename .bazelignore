@@ -1,0 +1,5 @@
+node_modules
+bazel-*
+.git
+cnpg
+airflow
